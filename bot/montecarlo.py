@@ -193,7 +193,15 @@ def best_move(white: int, black: int, is_white):
             iters += 1
             selected = select_leaf(root)
             if selected.is_terminal:
-                back_propagate(selected.parent, selected.score)
+                selected.visited += 1
+
+                # TODO refactor this a bit
+                score = selected.score
+
+                if not selected.is_white and score == 1:
+                    score = -1
+                back_propagate(selected.parent, score)
+
                 continue
 
             result = add_moves(selected)
