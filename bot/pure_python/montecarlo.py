@@ -1,4 +1,4 @@
-import util
+import bot.pure_python.util as util
 import math
 import random
 import time
@@ -59,7 +59,7 @@ def add_moves(node: Node):
         if node.parent is not None and node.parent.white == node.white and node.parent.black == node.black:
             child.is_terminal = True
             child.visited = 1
-            child.parent.visited += 1
+            child.score = get_game_outcome(black, white)
 
             return get_game_outcome(black, white)
         return
@@ -86,7 +86,7 @@ def add_moves(node: Node):
         if (n_white | n_black) == util.filled_board:
             child.is_terminal = True
             child.visited = 1
-            child.parent.visited += 1
+            child.score = get_game_outcome(n_black, n_white)
 
             return get_game_outcome(n_black, n_white)
 
@@ -112,7 +112,7 @@ def select_leaf(node: Node):
 def simulate(node):
     white = node.white
     black = node.black
-    is_white = node.is_white
+    is_white = not node.is_white
 
     while True:
         # game ended
@@ -181,9 +181,13 @@ def back_propagate(node: Node, score):
 
 
 def best_move(white: int, black: int, is_white):
+    # random.seed(1)
     root: RootNode = RootNode(white, black, not is_white)
 
-    add_moves(root)
+    result = add_moves(root)
+    if result is not None:
+        print("Only one move available!")
+        return root.move_map.get(root.children[0])
 
     # monte carlo tree search loop
     t = time.time()
@@ -198,8 +202,6 @@ def best_move(white: int, black: int, is_white):
                 # TODO refactor this a bit
                 score = selected.score
 
-                if not selected.is_white and score == 1:
-                    score = -1
                 back_propagate(selected.parent, score)
 
                 continue
@@ -209,7 +211,7 @@ def best_move(white: int, black: int, is_white):
             # non-None return means the child node is terminal, therefore we should just back-propagate
             if result is not None:
                 # FIXME this is total spaghetti
-                back_propagate(selected.children[0], result)
+                back_propagate(selected, result)
                 continue
 
             selected = random.choice(selected.children)
