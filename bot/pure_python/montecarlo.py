@@ -187,7 +187,7 @@ def best_move(white: int, black: int, is_white):
     result = add_moves(root)
     if result is not None:
         print("Only one move available!")
-        return root.move_map.get(root.children[0])
+        return root.move_map.get(root.children[0]), None
 
     # monte carlo tree search loop
     t = time.time()
@@ -233,8 +233,8 @@ def best_move(white: int, black: int, is_white):
     move = root.move_map.get(best_node)
 
     if move is None:
-        return -1
+        return None, None
     else:
         print("Selected:", move, best_node.is_white, best_node.score, best_node.visited,
               (best_node.score / best_node.visited) * 100, " iterations: ",iters)
-    return move
+    return move, best_node.score / best_node.visited

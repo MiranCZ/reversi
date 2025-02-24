@@ -218,7 +218,7 @@ def best_move(unsigned long long white, unsigned long long black, bint is_white)
     result = add_moves(root)
     if result != neg_infinity:
         print("Only one move available!")
-        return root.move_map.get(root.children[0])
+        return root.move_map.get(root.children[0]), None
 
     # monte carlo tree search loop
     cdef double t = time.time()
@@ -267,11 +267,11 @@ def best_move(unsigned long long white, unsigned long long black, bint is_white)
 
     if move is None:
         print("NO MOVE")
-        return -1
+        return None, None
     else:
         print("Selected:", move, best_node.is_white, best_node.score, best_node.visited,
               (best_node.score / best_node.visited) * 100, " iterations: ", iters)
-    return move
+    return move, best_node.score / best_node.visited
 
 cdef unsigned long long __masks[8];
 __masks[:] = [0x7F7F7F7F7F7F7F7FULL,
