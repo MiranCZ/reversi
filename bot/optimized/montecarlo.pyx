@@ -123,18 +123,17 @@ cdef Node select_leaf(Node node):
 
     return node
 
-cdef int bitcount(unsigned long long n) nogil:
+cdef int bit_count(unsigned long long n) nogil:
     """
-    thank you random stack overflow answer https://stackoverflow.com/a/77065365
+    via https://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
     """
-    n = ((n & 0xaaaaaaaaaaaaaaaaULL) >> 1) + (n & 0x5555555555555555ULL)
-    n = ((n & 0xccccccccccccccccULL) >> 2) + (n & 0x3333333333333333ULL)
-    n = ((n & 0xf0f0f0f0f0f0f0f0ULL) >> 4) + (n & 0x0f0f0f0f0f0f0f0fULL)
-    n = ((n & 0xff00ff00ff00ff00ULL) >> 8) + (n & 0x00ff00ff00ff00ffULL)
-    n = ((n & 0xffff0000ffff0000ULL) >> 16) + (n & 0x0000ffff0000ffffULL)
-    n = ((n & 0xffffffff00000000ULL) >> 32) + (n & 0x00000000ffffffffULL)
-
-    return <int> (n)
+    n -= (n >> 1) & 0x5555555555555555ULL  # put count of each 2 bits into those 2 bits
+    n = (n & 0x3333333333333333ULL) + ((n >> 2) & 0x3333333333333333ULL)  # put count of each 4 bits into those 4 bits
+    n = (n + (n >> 4)) & 0x0f0f0f0f0f0f0f0fULL  #put count of each 8 bits into those 8 bits
+    n += n >> 8  # put count of each 16 bits into their lowest 8 bits
+    n += n >> 16  # put count of each 32 bits into their lowest 8 bits
+    n += n >> 32  # put count of each 64 bits into their lowest 8 bits
+    return <int>(n & 0x7fULL)
 
 
 cdef float simulate(Node node) nogil:
@@ -162,7 +161,7 @@ cdef float simulate(Node node) nogil:
                 return get_game_outcome(black, white)
 
         # selects a random move from the available ones, uses some bitwise operator magic to speed stuff up
-        k = (rand() % (bitcount(moves)))
+        k = (rand() % (bit_count(moves)))
         # k = random.randrange(bitcount(moves))
         # k = random.randrange(moves.bit_count())
 
@@ -186,7 +185,7 @@ cdef float simulate(Node node) nogil:
         is_white = not is_white
 
 cdef float get_game_outcome(unsigned long long black,unsigned long long white) nogil:
-    cdef int final_value = bitcount(white) - bitcount(black)
+    cdef int final_value = bit_count(white) - bit_count(black)
     # cdef int final_value = white.bit_count() - black.bit_count()
 
     if final_value > 0:
@@ -225,7 +224,7 @@ def best_move(unsigned long long white, unsigned long long black, bint is_white)
     cdef double t = time.time()
     iters = 0
 
-    while time.time() - t < 1 :
+    while time.time() - t < 1:
         for i in range(200):
             iters += 1
             selected = select_leaf(root)
