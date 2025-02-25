@@ -13,7 +13,7 @@ __rshifts = [1, 9, 8, 7, 0, 0, 0, 0]
 pos_infinity = float('inf')
 neg_infinity = float('-inf')
 
-filled_board = (1<<64)-1
+filled_board = (1 << 64) - 1
 
 
 def shift(disks, dir):
@@ -33,6 +33,7 @@ def get_moves(white: int, black: int, is_white: bool):
         return __get_moves(black, white)
 
 
+# noinspection DuplicatedCode
 def __get_moves(player: int, opponent: int):
     """
     via: https://www.hanshq.net/othello.html#moves
@@ -41,22 +42,23 @@ def __get_moves(player: int, opponent: int):
     empty_cells = ~(player | opponent)
     legal_moves = 0
 
-    for dir in range(8):
-        x = shift(player, dir) & opponent
+    for direction in range(8):
+        x = shift(player, direction) & opponent
 
-        x |= shift(x, dir) & opponent
-        x |= shift(x, dir) & opponent
-        x |= shift(x, dir) & opponent
-        x |= shift(x, dir) & opponent
-        x |= shift(x, dir) & opponent
+        x |= shift(x, direction) & opponent
+        x |= shift(x, direction) & opponent
+        x |= shift(x, direction) & opponent
+        x |= shift(x, direction) & opponent
+        x |= shift(x, direction) & opponent
 
-        legal_moves |= shift(x, dir) & empty_cells
+        legal_moves |= shift(x, direction) & empty_cells
 
     return legal_moves
 
 
 def get_captured(white: int, black: int, is_white: bool, move):
     return get_captured_shifted(white, black, is_white, 1 << move)
+
 
 def get_captured_shifted(white: int, black: int, is_white: bool, move_shifted):
     if is_white:
@@ -65,6 +67,7 @@ def get_captured_shifted(white: int, black: int, is_white: bool, move_shifted):
         return __get_captured(black, white, move_shifted)
 
 
+# noinspection DuplicatedCode
 def __get_captured(player: int, opponent: int, move: int):
     """
     via: https://www.hanshq.net/othello.html#moves
@@ -72,16 +75,16 @@ def __get_captured(player: int, opponent: int, move: int):
     player |= move
     captured = 0
 
-    for dir in range(8):
-        x = shift(move, dir) & opponent
+    for direction in range(8):
+        x = shift(move, direction) & opponent
 
-        x |= shift(x, dir) & opponent
-        x |= shift(x, dir) & opponent
-        x |= shift(x, dir) & opponent
-        x |= shift(x, dir) & opponent
-        x |= shift(x, dir) & opponent
+        x |= shift(x, direction) & opponent
+        x |= shift(x, direction) & opponent
+        x |= shift(x, direction) & opponent
+        x |= shift(x, direction) & opponent
+        x |= shift(x, direction) & opponent
 
-        closing_disk = shift(x, dir) & player
+        closing_disk = shift(x, direction) & player
         captured |= (x if closing_disk != 0 else 0)
 
     return captured

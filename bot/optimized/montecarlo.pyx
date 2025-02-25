@@ -36,6 +36,7 @@ cdef class Node:
     def add_child(self, child, move):
         self.children.append(child)
 
+
 cdef class RootNode(Node):
 
     cdef dict[Node, int] move_map;
@@ -48,6 +49,7 @@ cdef class RootNode(Node):
         super().add_child(child, move)
 
         self.move_map[child] = move
+
 
 cdef float add_moves(Node node):
     cdef unsigned long long white = node.white
@@ -104,6 +106,7 @@ cdef float add_moves(Node node):
 
     return neg_infinity
 
+
 cdef Node select_leaf(Node node):
     cdef Node best_child;
     cdef float best_value;
@@ -122,6 +125,7 @@ cdef Node select_leaf(Node node):
         node = best_child
 
     return node
+
 
 cdef int bit_count(unsigned long long n) nogil:
     """
@@ -162,15 +166,12 @@ cdef float simulate(Node node) nogil:
 
         # selects a random move from the available ones, uses some bitwise operator magic to speed stuff up
         k = (rand() % (bit_count(moves)))
-        # k = random.randrange(bitcount(moves))
-        # k = random.randrange(moves.bit_count())
 
         for i in range(k):
             # Remove the lowest set bit
             moves &= moves - 1
 
         lsb = moves & -moves
-        # move = lsb.bit_length() - 1
 
         captured = get_captured_shifted(white, black, is_white, lsb)
 
@@ -184,6 +185,7 @@ cdef float simulate(Node node) nogil:
 
         is_white = not is_white
 
+
 cdef float get_game_outcome(unsigned long long black,unsigned long long white) nogil:
     cdef int final_value = bit_count(white) - bit_count(black)
     # cdef int final_value = white.bit_count() - black.bit_count()
@@ -194,6 +196,7 @@ cdef float get_game_outcome(unsigned long long black,unsigned long long white) n
         return -1
     else:
         return 0.5
+
 
 cdef void back_propagate(Node node, float score):
     cdef bint is_tie = (score == 0.5)
@@ -210,7 +213,8 @@ cdef void back_propagate(Node node, float score):
             node.score += 1
         node = node.parent
 
-def best_move(unsigned long long white, unsigned long long black, bint is_white):
+
+def best_move(unsigned long long white, unsigned long long black, bint is_white, float max_search_time):
     cdef float score;
     cdef RootNode root = RootNode(white, black, not is_white)
     cdef Node selected, node, child;
@@ -224,7 +228,7 @@ def best_move(unsigned long long white, unsigned long long black, bint is_white)
     cdef double t = time.time()
     iters = 0
 
-    while time.time() - t < 1:
+    while time.time() - t < max_search_time:
         for i in range(200):
             iters += 1
             selected = select_leaf(root)
@@ -273,6 +277,7 @@ def best_move(unsigned long long white, unsigned long long black, bint is_white)
               (best_node.score / best_node.visited) * 100, " iterations: ", iters)
     return move, best_node.score / best_node.visited
 
+
 cdef unsigned long long __masks[8];
 __masks[:] = [0x7F7F7F7F7F7F7F7FULL,
               0x007F7F7F7F7F7F7FULL,
@@ -292,6 +297,7 @@ __rshifts[:] = [1, 9, 8, 7, 0, 0, 0, 0]
 cdef float pos_infinity = float('inf')
 cdef float neg_infinity = float('-inf')
 
+
 cdef unsigned long long shift(unsigned long long disks, int dir) nogil:
     """
     via: https://www.hanshq.net/othello.html#bitboards
@@ -301,12 +307,15 @@ cdef unsigned long long shift(unsigned long long disks, int dir) nogil:
     else:
         return (disks << __lshifts[dir]) & __masks[dir]
 
+
 cdef unsigned long long get_moves(unsigned long long white, unsigned long long black, bint is_white) nogil:
     if is_white:
         return __get_moves(white, black)
     else:
         return __get_moves(black, white)
 
+
+# noinspection DuplicatedCode
 cdef unsigned long long __get_moves(unsigned long long player, unsigned long long opponent) nogil:
     """
     via: https://www.hanshq.net/othello.html#moves
@@ -316,22 +325,24 @@ cdef unsigned long long __get_moves(unsigned long long player, unsigned long lon
     empty_cells = ~(player | opponent)
     legal_moves = 0
 
-    cdef int dir;
-    for dir in range(8):
-        x = shift(player, dir) & opponent
+    cdef int direction;
+    for direction in range(8):
+        x = shift(player, direction) & opponent
 
-        x |= shift(x, dir) & opponent
-        x |= shift(x, dir) & opponent
-        x |= shift(x, dir) & opponent
-        x |= shift(x, dir) & opponent
-        x |= shift(x, dir) & opponent
+        x |= shift(x, direction) & opponent
+        x |= shift(x, direction) & opponent
+        x |= shift(x, direction) & opponent
+        x |= shift(x, direction) & opponent
+        x |= shift(x, direction) & opponent
 
-        legal_moves |= shift(x, dir) & empty_cells
+        legal_moves |= shift(x, direction) & empty_cells
 
     return legal_moves
 
+
 cdef unsigned long long get_captured(unsigned long long white, unsigned long long black, bint is_white, int move) nogil:
     return get_captured_shifted(white, black, is_white, 1ULL << move)
+
 
 
 cdef long long get_captured_shifted(unsigned long long white, unsigned long long black, bint is_white, unsigned long long move_shifted) nogil:
@@ -340,6 +351,8 @@ cdef long long get_captured_shifted(unsigned long long white, unsigned long long
     else:
         return __get_captured(black, white, move_shifted)
 
+
+# noinspection DuplicatedCode
 cdef unsigned long long __get_captured(unsigned long long player, unsigned long long opponent, unsigned long long move) nogil:
     """
     via: https://www.hanshq.net/othello.html#moves
@@ -349,17 +362,17 @@ cdef unsigned long long __get_captured(unsigned long long player, unsigned long 
     player |= move
     captured = 0
 
-    cdef int dir;
-    for dir in range(8):
-        x = shift(move, dir) & opponent
+    cdef int direction;
+    for direction in range(8):
+        x = shift(move, direction) & opponent
 
-        x |= shift(x, dir) & opponent
-        x |= shift(x, dir) & opponent
-        x |= shift(x, dir) & opponent
-        x |= shift(x, dir) & opponent
-        x |= shift(x, dir) & opponent
+        x |= shift(x, direction) & opponent
+        x |= shift(x, direction) & opponent
+        x |= shift(x, direction) & opponent
+        x |= shift(x, direction) & opponent
+        x |= shift(x, direction) & opponent
 
-        closing_disk = shift(x, dir) & player
+        closing_disk = shift(x, direction) & player
         captured |= (x if closing_disk != 0 else 0)
 
     return captured

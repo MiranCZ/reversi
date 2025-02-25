@@ -3,8 +3,6 @@ import math
 import random
 import time
 
-random.seed(0)
-
 
 class Node:
     constant = math.sqrt(2)
@@ -128,7 +126,6 @@ def simulate(node):
             if moves == 0:
                 return get_game_outcome(black, white)
 
-
         # selects a random move from the available ones, uses some bitwise operator magic to speed stuff up
         k = random.randrange(moves.bit_count())
 
@@ -137,7 +134,6 @@ def simulate(node):
             moves &= moves - 1
 
         lsb = moves & -moves
-        # move = lsb.bit_length() - 1
 
         captured = util.get_captured_shifted(white, black, is_white, lsb)
 
@@ -167,7 +163,6 @@ def back_propagate(node: Node, score):
 
     winner_color = True if score > 0 else False
 
-
     while node is not None:
         node.visited += 1
         if is_tie:
@@ -180,8 +175,7 @@ def back_propagate(node: Node, score):
         node = node.parent
 
 
-def best_move(white: int, black: int, is_white):
-    # random.seed(1)
+def best_move(white: int, black: int, is_white, max_search_time):
     root: RootNode = RootNode(white, black, not is_white)
 
     result = add_moves(root)
@@ -192,7 +186,7 @@ def best_move(white: int, black: int, is_white):
     # monte carlo tree search loop
     t = time.time()
     iters = 0
-    while time.time() - t < 1 and iters < 50_000:
+    while time.time() - t < max_search_time and iters < 50_000:
         for i in range(20):
             iters += 1
             selected = select_leaf(root)
@@ -236,5 +230,5 @@ def best_move(white: int, black: int, is_white):
         return None, None
     else:
         print("Selected:", move, best_node.is_white, best_node.score, best_node.visited,
-              (best_node.score / best_node.visited) * 100, " iterations: ",iters)
+              (best_node.score / best_node.visited) * 100, " iterations: ", iters)
     return move, best_node.score / best_node.visited
