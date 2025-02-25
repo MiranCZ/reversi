@@ -5,10 +5,23 @@ import os
 import shutil
 
 
-class BuildExtInplace(build_ext):
+class CustomBuildExt(build_ext):
     def finalize_options(self):
         build_ext.finalize_options(self)
         self.inplace = True
+
+    def run(self):
+        try:
+            super().run()
+        except Exception:
+            print("WARNING: Failed to build Cython extensions. Installation will continue without them.")
+            self.extensions = []
+
+    def build_extension(self, ext):
+        try:
+            super().build_extension(ext)
+        except Exception as e:
+            print(f"WARNING: Failed to build extension {ext.name}. Skipping it. Error: {e}")
 
 
 # removes temp build directories and files
@@ -34,7 +47,7 @@ setup(
     # ext_modules=[cythonize(name) for name in cython_modules],
     ext_modules=cythonize(extensions),
     language='c++',
-    cmdclass={"build_ext": BuildExtInplace},
+    cmdclass={"build_ext": CustomBuildExt},
     zip_safe=False
 )
 
