@@ -15,24 +15,6 @@ neg_infinity = float('-inf')
 
 filled_board = (1<<64)-1
 
-def parse_board(board: list[list[str]]):
-    white: int = 0
-    black: int = 0
-
-    # parse board to a bitboard representation
-    for i in range(8):
-        for j in range(8):
-            piece = board[i][j]
-
-            index = i * 8 + j
-
-            if piece == 'W':
-                white |= 1 << index
-            elif piece == 'B':
-                black |= 1 << index
-
-    return white, black
-
 
 def shift(disks, dir):
     """
