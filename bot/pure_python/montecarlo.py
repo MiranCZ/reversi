@@ -52,7 +52,7 @@ def add_moves(node: Node):
         child: Node = Node(node.white, node.black, is_white, node)
         node.add_child(child, None)
 
-        # this means two node skips aka game end
+        # this means two node skips aka core end
         # FIXME still not entirely sure the logic here is correct
         if node.parent is not None and node.parent.white == node.white and node.parent.black == node.black:
             child.is_terminal = True
@@ -113,7 +113,7 @@ def simulate(node):
     is_white = not node.is_white
 
     while True:
-        # game ended
+        # core ended
         if (white | black) == util.filled_board:
             return get_game_outcome(black, white)
 

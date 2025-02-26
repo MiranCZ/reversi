@@ -1,4 +1,4 @@
-from board import *
+from core.board import *
 
 class Game:
     def __init__(self, white, black):
@@ -25,9 +25,9 @@ class Game:
         return self.board.play_move(row, col, player)
 
     def winner(self):
-        if self.board.get_b_sutry() > self.board.get_w_sutry:
+        if self.board.get_b_sutry() > self.board.get_w_sutry():
             winner = "B"
-        elif self.board.get_w_sutry() > self.board.get_b_sutry:
+        elif self.board.get_w_sutry() > self.board.get_b_sutry():
             winner = "W"
         else:
             winner = None
