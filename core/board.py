@@ -2,8 +2,8 @@ class Board:
     def __init__(self, x=8, y=8):
         self.x = x
         self.y = y
-        self.board = [['.' for _ in range(y)] for _ in range(x)] #chatgpt
-        self.directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)] #chatgpt
+        self.board = [['.' for i in range(y)] for i in range(x)]
+        self.directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
         self.initial_stones()
 
 

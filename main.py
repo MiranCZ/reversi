@@ -3,12 +3,18 @@ from core.gamemanager import GameManager
 import math
 from ui.button import Button
 from ui.bar import Bar
-import ctypes
-ctypes.windll.user32.SetProcessDPIAware()
+
+# fixes weird windows resize issue
+# from: https://stackoverflow.com/a/32063729
+try:
+    import ctypes
+    ctypes.windll.user32.SetProcessDPIAware()
+except Exception:
+    pass
 
 pygame.display.init()
 pygame.font.init()
-print(pygame.display.Info().current_w, pygame.display.Info().current_h)
+
 game_display = pygame.display.set_mode(((pygame.display.Info().current_w, pygame.display.Info().current_h)), pygame.FULLSCREEN|pygame.SCALED)
 clock = pygame.time.Clock()
 pygame.display.set_caption("Reversi")
@@ -43,7 +49,7 @@ def on_game_ended():
     global game_ended
     game_ended = True
 
-gamemanager = GameManager(True, True, set_player_turn, on_game_ended, bar, 0.1)
+gamemanager = GameManager(True, False, set_player_turn, on_game_ended, bar)
 board = gamemanager.game.board
 
 def draw_text(text, font, text_color, x, y):
@@ -115,10 +121,11 @@ def reset():
     minutes = 0
     minutes_ten = 0
     seconds_ten = 0
-    gamemanager = GameManager(False, True, set_player_turn, on_game_ended, bar)
+    gamemanager = GameManager(True, False, set_player_turn, on_game_ended, bar)
     board = gamemanager.game.board
     game_ended = False
     button = None
+    bar.percentage = 0.5
 
 def victory_screen():
     global button
@@ -141,7 +148,6 @@ def victory_screen():
     button = Button(width / 2 - 300, height / 2, 300, 100, "#DDB892", "#B08968", "Play again", font, reset)
     button.render(game_display)
 
-print(gamemanager.game.get_moves_for_now_player())
 
 while running:
     for event in pygame.event.get():

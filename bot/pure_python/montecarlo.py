@@ -52,8 +52,7 @@ def add_moves(node: Node):
         child: Node = Node(node.white, node.black, is_white, node)
         node.add_child(child, None)
 
-        # this means two node skips aka core end
-        # FIXME still not entirely sure the logic here is correct
+        # this means two node skips aka game end
         if node.parent is not None and node.parent.white == node.white and node.parent.black == node.black:
             child.is_terminal = True
             child.visited = 1
@@ -180,7 +179,7 @@ def best_move(white: int, black: int, is_white, max_search_time):
 
     result = add_moves(root)
     if result is not None:
-        print("Only one move available!")
+        # Only one move available
         return root.move_map.get(root.children[0]), None
 
     # monte carlo tree search loop
@@ -193,9 +192,7 @@ def best_move(white: int, black: int, is_white, max_search_time):
             if selected.is_terminal:
                 selected.visited += 1
 
-                # TODO refactor this a bit
                 score = selected.score
-
                 back_propagate(selected.parent, score)
 
                 continue
@@ -204,7 +201,6 @@ def best_move(white: int, black: int, is_white, max_search_time):
 
             # non-None return means the child node is terminal, therefore we should just back-propagate
             if result is not None:
-                # FIXME this is total spaghetti
                 back_propagate(selected, result)
                 continue
 

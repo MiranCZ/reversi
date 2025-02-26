@@ -29,11 +29,14 @@ class GameManager:
 
         result = self.mcts.get_best_move(board, is_white)
         if result is None:
+            # this should not happen...
             raise AssertionError("ur bad, go fix code")
 
         # prevent bot from moving too fast
-        while time.time() - time_start < 1:
-            pass
+        diff = 1 -(time.time() - time_start)
+
+        if diff > 0:
+            time.sleep(diff)
 
         score = result[1]
         if score is not None:
@@ -57,7 +60,8 @@ class GameManager:
 
     def on_player_move(self, x, y):
         if self.game.natahu.is_bot:
-            raise AssertionError("Why the heck is player moving when bot is supposed to :(")
+            print("Why the heck is player moving when bot is supposed to :(")
+            return
 
         if self.game.make_move(x, y):
             self.should_play_turn = True
