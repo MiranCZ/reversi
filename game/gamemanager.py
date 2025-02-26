@@ -15,7 +15,6 @@ class GameManager:
         self.game = Game(self.p1, self.p2)
         self.mcts = Mcts(bot_think_seconds)
 
-        self.prev_turn_skipped = False
         self.should_play_turn = True
 
 
@@ -33,6 +32,7 @@ class GameManager:
         self.game.make_move(x, y)
 
         self.should_play_turn = True
+        self.game.stridani()
 
 
     # TODO this should be called by UI
@@ -52,28 +52,31 @@ class GameManager:
         self.game.make_move(x, y)
 
         self.should_play_turn = True
+        self.game.stridani()
 
 
     def __game_turn(self):
         moves = self.game.get_moves_for_now_player()
+        # print("Turn, ", moves)
 
         # hrac nema zadny tah
         if len(moves) == 0:
-            # game end
-            if self.prev_turn_skipped:
-                # TODO call UI that the game ended and who won
-                pass
 
             # TODO callback to UI that the move was skipped?
-            self.prev_turn_skipped = True
             self.game.stridani()
 
-            self.should_play_turn = True
+            moves = self.game.get_moves_for_now_player()
+
+            # game end
+            if len(moves) == 0:
+                # TODO call UI that the game ended and who won
+                exit(0)
+
 
         current_player = self.game.kdo_hraje()
 
         if current_player.is_bot:
-            bot_thread = threading.Thread(target = self.get_bot_move, args = [self.game.board, True])
+            bot_thread = threading.Thread(target = self.get_bot_move, args = [self.game.board.board, current_player == self.game.white])
             bot_thread.start()
         else:
             # TODO call UI to handle move
@@ -82,3 +85,13 @@ class GameManager:
 
 
 
+if __name__ == '__main__':
+
+    m = GameManager(True, True)
+
+    import time
+
+    while True:
+        m.tick()
+        m.game.board.print_board()
+        time.sleep(1)
