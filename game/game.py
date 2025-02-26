@@ -22,7 +22,7 @@ class Game:
             player = "B"
         else:
             player = "W"
-        self.board.play_move(row, col, player)
+        return self.board.play_move(row, col, player)
 
     def winner(self):
         if self.board.get_b_sutry() > self.board.get_w_sutry:
