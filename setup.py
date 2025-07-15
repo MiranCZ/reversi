@@ -40,7 +40,7 @@ def clean_build_artifacts():
 
 
 extensions = [
-    Extension("bot.optimized.montecarlo", ["bot/optimized/montecarlo.pyx"])
+    Extension("reversi.bot.optimized.montecarlo", ["reversi/bot/optimized/montecarlo.pyx"])
 ]
 
 setup(
