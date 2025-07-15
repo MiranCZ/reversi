@@ -39,10 +39,10 @@ def load_deps():
     import sys
 
     if deps and not cython:
-        subprocess.run([sys.executable, "../setup.py", "build_ext", "--inplace"])
+        subprocess.run([sys.executable, "setup.py", "build_ext", "--inplace"])
         return
 
-    subprocess.run([sys.executable, "pip", "install", "../"])
+    subprocess.run([sys.executable, "pip", "install", "."])
 
     try:
         import pygame
@@ -54,12 +54,25 @@ def load_deps():
     if not cython_built():
         print("Failed to build cython file!")
 
+def module_accessible():
+    return __package__ is not None and __package__ != ""
+
 if __name__ == '__main__':
     import os
     import sys
+    import pathlib
 
-    script_dir = os.path.abspath(os.path.dirname(__file__))
+    script_dir = os.path.abspath(pathlib.Path(__file__).parent.parent)
     os.chdir(script_dir)
+    print("Set cmd directory to",script_dir)
+
+    if not module_accessible():
+        import subprocess
+
+        print("HOTFIX: Trying to run app as module...")
+        subprocess.run([sys.executable, "-m", "reversi"])
+        exit(0)
+
 
     load_deps()
     win_resize_hotfix()
