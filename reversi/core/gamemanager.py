@@ -1,6 +1,6 @@
-from core.game import Game
-from core.player import Player
-from bot.mcts import Mcts
+from reversi.core.game import Game
+from reversi.core.player import Player
+from reversi.bot.mcts import Mcts
 
 import time
 import threading

@@ -1,12 +1,12 @@
 try:
-    import bot.optimized.montecarlo as montecarlo
+    import reversi.bot.optimized.montecarlo as montecarlo
 except ImportError:
     print(
         "Failed to import cython package!\n"
         "Using pure python as fallback, this means the bot will be significantly slower!\n"
     )
 
-    import bot.pure_python.montecarlo as montecarlo
+    import reversi.bot.pure_python.montecarlo as montecarlo
 
 
 class Mcts:

@@ -1,4 +1,4 @@
-from core.board import *
+from reversi.core.board import *
 
 class Game:
     def __init__(self, white, black):

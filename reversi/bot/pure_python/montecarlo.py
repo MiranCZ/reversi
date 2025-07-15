@@ -1,4 +1,4 @@
-import bot.pure_python.util as util
+import reversi.bot.pure_python.util as util
 import math
 import random
 import time
