@@ -80,8 +80,8 @@ def draw_scoreboard():
     draw_text("Black", font, (0, 0, 0), rect_x + size + 150, size / 2 - 30)
     draw_text("White", font, (0, 0, 0), rect_x + size + 360, size / 2 - 30)
 
-    draw_text(str(board.get_b_sutry()), font_stopwatch, (0, 0, 0), rect_x + size + 150, size / 2 + 40)
-    draw_text(str(board.get_w_sutry()), font_stopwatch, (0, 0, 0), rect_x + size + 360, size / 2 + 40)
+    draw_text(str(board.get_b_stones()), font_stopwatch, (0, 0, 0), rect_x + size + 150, size / 2 + 40)
+    draw_text(str(board.get_w_stones()), font_stopwatch, (0, 0, 0), rect_x + size + 360, size / 2 + 40)
 
 
 def draw_board():
@@ -115,7 +115,7 @@ def draw_disks():
             elif board.board[row][column] == "B":
                 disk_color = "#000000"
             elif board.board[row][column] == ".":
-                if (row, column) in valid_moves and not gamemanager.game.natahu.is_bot:
+                if (row, column) in valid_moves and not gamemanager.game.to_move.is_bot:
                     pygame.draw.circle(game_display, "#B08968", (rect_x + (row * size / 8) + size / 16 + 1,
                                                                  rect_y + (column * size / 8) + size / 16 + 1), 25)
                 continue

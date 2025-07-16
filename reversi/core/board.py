@@ -27,12 +27,12 @@ class Board:
             for col in range(self.y):
                 if self.board[row][col] == '.':
                     for direction in self.directions:
-                        if self.valid_smer(row, col, direction[0], direction[1], player, opp):
+                        if self.valid_dir(row, col, direction[0], direction[1], player, opp):
                             valid_moves.append((row, col))
                             break
         return valid_moves
 
-    def valid_smer(self, x, y, move_row, move_col, player, opp):
+    def valid_dir(self, x, y, move_row, move_col, player, opp):
         x = x + move_row
         y = y + move_col
         found_opp = False
@@ -57,7 +57,7 @@ class Board:
         flipped_any = False
 
         for direction in self.directions:
-            if self.flip_sutry(row, col, direction[0], direction[1], player, opp):
+            if self.flip_stones(row, col, direction[0], direction[1], player, opp):
                 flipped_any = True
 
         if flipped_any:
@@ -65,7 +65,7 @@ class Board:
 
         return flipped_any
 
-    def flip_sutry(self, row, col, dx, dy, player, opp):
+    def flip_stones(self, row, col, dx, dy, player, opp):
         x, y = row + dx, col + dy
         pieces_to_flip = []
 
@@ -81,8 +81,8 @@ class Board:
 
         return False
 
-    def get_b_sutry(self):
+    def get_b_stones(self):
         return sum(row.count('B') for row in self.board)
 
-    def get_w_sutry(self):
+    def get_w_stones(self):
         return sum(row.count('W') for row in self.board)

@@ -49,7 +49,7 @@ class GameManager:
         self.game.make_move(x, y)
 
         self.should_play_turn = True
-        self.game.stridani()
+        self.game.switch_player()
 
     def tick(self):
         if self.game_ended:
@@ -59,23 +59,23 @@ class GameManager:
             self.__game_turn()
 
     def on_player_move(self, x, y):
-        if self.game.natahu.is_bot:
+        if self.game.to_move.is_bot:
             print("Why the heck is player moving when bot is supposed to :(")
             return
 
         if self.game.make_move(x, y):
             self.should_play_turn = True
-            self.game.stridani()
+            self.game.switch_player()
             self.set_player_turn(False)
 
     def __game_turn(self):
         moves = self.game.get_moves_for_now_player()
 
-        # hrac nema zadny tah
+        # player has no moves
         if len(moves) == 0:
 
             # TODO callback to UI that the move was skipped?
-            self.game.stridani()
+            self.game.switch_player()
 
             moves = self.game.get_moves_for_now_player()
 
@@ -85,7 +85,7 @@ class GameManager:
                 self.on_game_ended()
                 return
 
-        current_player = self.game.kdo_hraje()
+        current_player = self.game.get_to_move()
 
         if current_player.is_bot:
             bot_thread = threading.Thread(target=self.get_bot_move,args=[self.game.board.board, self.is_white_playing()])
@@ -94,7 +94,7 @@ class GameManager:
             self.set_player_turn(True)
 
     def is_white_playing(self):
-        return self.game.kdo_hraje() == self.game.white
+        return self.game.get_to_move() == self.game.white
 
     def is_black_playing(self):
-        return self.game.kdo_hraje() == self.game.black
+        return self.game.get_to_move() == self.game.black
